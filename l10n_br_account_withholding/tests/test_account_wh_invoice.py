@@ -55,6 +55,36 @@ class AccountMoveWithWhInvoice(AccountMoveBRCommon):
         cls.env.ref("l10n_br_fiscal.tax_group_pis_wh").generate_wh_invoice = True
         cls.env.ref("l10n_br_fiscal.tax_group_cofins_wh").generate_wh_invoice = True
 
+        cls.service_test = cls.env["product.product"].create(
+            {
+                "name": "Serviço de Testes",
+                "type": "service",
+                "standard_price": 1000.0,
+                "tax_icms_or_issqn": "issqn",
+                "ncm_id": cls.env.ref("l10n_br_fiscal.ncm_00000000").id,
+                "fiscal_type": "09",
+                "fiscal_genre_id": cls.env.ref("l10n_br_fiscal.product_genre_00").id,
+                "service_type_id": cls.env.ref("l10n_br_fiscal.service_type_1009").id,
+                "taxes_id": False,
+            }
+        )
+
+        cls.test_partner = cls.env["res.partner"].create(
+            {
+                "name": "Test Company Brasil",
+                "legal_name": "Test Company Brasil Ltda",
+                "cnpj_cpf": "32.680.221/0001-44",
+                "state_id": cls.env.ref("base.state_br_sp").id,
+                "city_id": cls.env.ref("l10n_br_base.city_3550308").id,
+                "zip": "04576-060",
+                "country_id": cls.env.ref("base.br").id,
+                "inscr_est": "621.240.850.633",
+                "is_company": True,
+                "active": True,
+            }
+        )
+        cls.test_partner._onchange_city_id()
+
     @classmethod
     def setup_company_data(cls, company_name, chart_template=None, **kwargs):
         if company_name == "company_1_data":
@@ -76,7 +106,7 @@ class AccountMoveWithWhInvoice(AccountMoveBRCommon):
             document_type_id=cls.env.ref("l10n_br_fiscal.document_55").id,
             **kwargs,
         )
-        res["company"].partner_id.state_id = cls.env.ref("base.state_br_sp").id
+        res["company"].partner_id.state_id = cls.env.ref("base.state_br_sp")
         chart_template.load_fiscal_taxes()
         return res
 
@@ -309,4 +339,138 @@ class AccountMoveWithWhInvoice(AccountMoveBRCommon):
             self.move_in_compra_para_revenda.wh_invoice_count,
             2,
             "The invoice should have 2 withholding invoices (PIS and COFINS).",
+        )
+
+    def test_with_partner_issqn_without_city_partner(self):
+        "Test move with Partner defined and no ISSQN City Partner"
+        self.env.ref("l10n_br_fiscal.tax_group_pis_wh").generate_wh_invoice = False
+        self.env.ref("l10n_br_fiscal.tax_group_cofins_wh").generate_wh_invoice = False
+        product = self.service_test
+        tax_group = self.env.ref("l10n_br_fiscal.tax_group_issqn_wh")
+        tax_group.generate_wh_invoice = True
+        tax_group.journal_id = self.company_data["default_journal_purchase"].id
+        move_issqn = self.init_invoice(
+            "in_invoice",
+            products=[product],
+            partner=self.test_partner,
+            document_type=self.env.ref("l10n_br_fiscal.document_55"),
+            fiscal_operation=self.env.ref("l10n_br_fiscal.fo_compras"),
+            fiscal_operation_lines=[self.env.ref("l10n_br_fiscal.fo_compras_servico")],
+            document_serie="1",
+            document_number="56",
+        )
+
+        for line_ids in move_issqn.invoice_line_ids:
+            line_ids.issqn_tax_id = None
+            line_ids.issqn_fg_city_id = self.env.ref("l10n_br_base.city_3550308")
+            line_ids.issqn_wh_tax_id = self.env.ref("l10n_br_fiscal.tax_issqn_wh_5")
+
+        move_issqn.invoice_line_ids._onchange_fiscal_taxes()
+        move_issqn.invoice_line_ids._onchange_fiscal_tax_ids()
+        move_issqn.with_context(check_move_validity=False)._recompute_dynamic_lines(
+            recompute_all_taxes=True
+        )
+
+        move_issqn.action_post()
+        move_issqn._compute_wh_invoice_ids()
+
+        self.assertEqual(
+            move_issqn.wh_invoice_count,
+            1,
+            "The invoice should have 1 withholding invoice (ISSQN).",
+        )
+
+        partner_wh = self.env["res.partner"].search(
+            [
+                ("city_id", "=", move_issqn.invoice_line_ids[0].issqn_fg_city_id.id),
+                ("wh_cityhall", "=", True),
+            ],
+            limit=1,
+        )
+
+        expected_partner_id = partner_wh if partner_wh else tax_group.partner_id
+
+        self.assertTrue(
+            all(
+                wh_inv.partner_id == expected_partner_id
+                for wh_inv in move_issqn.wh_invoice_ids
+            )
+        )
+
+    def test_with_partner_issqn_with_city_partner(self):
+        "Test move with Partner and ISSQN City Partner"
+        self.env.ref("l10n_br_fiscal.tax_group_pis_wh").generate_wh_invoice = False
+        self.env.ref("l10n_br_fiscal.tax_group_cofins_wh").generate_wh_invoice = False
+        product = self.service_test
+        wh_payable_account = self.env["account.account"].create(
+            {
+                "name": "Withholding Payable",
+                "code": "WHT210",
+                "user_type_id": self.env.ref("account.data_account_type_payable").id,
+                "reconcile": True,
+                "company_id": self.company_data["company"].id,
+            }
+        )
+
+        tax_group = self.env.ref("l10n_br_fiscal.tax_group_issqn_wh")
+        tax_group.write(
+            {
+                "generate_wh_invoice": True,
+                "journal_id": self.company_data["default_journal_purchase"].id,
+                "wh_payable_account_id": wh_payable_account.id,
+            }
+        )
+        partner_cityhall = self.env["res.partner"].create(
+            {
+                "name": "Prefeitura de São Paulo",
+                "city_id": self.env.ref("l10n_br_base.city_3550308").id,
+                "state_id": self.env.ref("base.state_br_sp").id,
+                "country_id": self.env.ref("base.br").id,
+                "wh_cityhall": True,
+            }
+        )
+        move_issqn = self.init_invoice(
+            "in_invoice",
+            products=[product],
+            partner=partner_cityhall,
+            document_type=self.env.ref("l10n_br_fiscal.document_55"),
+            fiscal_operation=self.env.ref("l10n_br_fiscal.fo_compras"),
+            fiscal_operation_lines=[self.env.ref("l10n_br_fiscal.fo_compras_servico")],
+            document_serie="1",
+            document_number="56",
+        )
+
+        for line_ids in move_issqn.invoice_line_ids:
+            line_ids.issqn_tax_id = None
+            line_ids.issqn_fg_city_id = self.env.ref("l10n_br_base.city_3550308")
+            line_ids.issqn_wh_tax_id = self.env.ref("l10n_br_fiscal.tax_issqn_wh_5")
+
+        move_issqn.invoice_line_ids._onchange_fiscal_taxes()
+        move_issqn.invoice_line_ids._onchange_fiscal_tax_ids()
+        move_issqn.with_context(check_move_validity=False)._recompute_dynamic_lines(
+            recompute_all_taxes=True
+        )
+
+        move_issqn.action_post()
+        move_issqn._compute_wh_invoice_ids()
+
+        self.assertEqual(
+            move_issqn.wh_invoice_count,
+            1,
+            "The invoice should have 1 withholding invoice (ISSQN).",
+        )
+        self.assertTrue(
+            all(
+                wh_inv.partner_id == partner_cityhall
+                for wh_inv in move_issqn.wh_invoice_ids
+            )
+        )
+        payable_line_ids = move_issqn.wh_invoice_ids.line_ids.filtered(
+            lambda line: line.account_id.internal_type == "payable"
+        )
+        self.assertTrue(
+            all(
+                pay_line.account_id == wh_payable_account
+                for pay_line in payable_line_ids
+            )
         )

@@ -14,10 +14,12 @@ from ..constants.fiscal import (
     PROCESSADOR_NENHUM,
     PROFIT_CALCULATION,
     PROFIT_CALCULATION_PRESUMED,
+    TAX_DOMAIN_CBS,
     TAX_DOMAIN_COFINS,
     TAX_DOMAIN_COFINS_WH,
     TAX_DOMAIN_CSLL,
     TAX_DOMAIN_CSLL_WH,
+    TAX_DOMAIN_IBS,
     TAX_DOMAIN_ICMS,
     TAX_DOMAIN_ICMS_SN,
     TAX_DOMAIN_INSS,
@@ -45,8 +47,14 @@ class ResCompany(models.Model):
         partner_fields = super()._get_company_address_field_names()
         return partner_fields + [
             "tax_framework",
+            "legal_nature_id",
             "cnae_main_id",
         ]
+
+    def _inverse_legal_nature_id(self):
+        """Write the l10n_br specific functional fields."""
+        for c in self:
+            c.partner_id.legal_nature_id = c.legal_nature_id
 
     def _inverse_cnae_main_id(self):
         """Write the l10n_br specific functional fields."""
@@ -104,6 +112,13 @@ class ResCompany(models.Model):
                         * 100,
                         record.currency_id.decimal_places,
                     )
+
+    legal_nature_id = fields.Many2one(
+        comodel_name="l10n_br_fiscal.legal.nature",
+        string="Legal Nature",
+        compute="_compute_address",
+        inverse="_inverse_legal_nature_id",
+    )
 
     cnae_main_id = fields.Many2one(
         comodel_name="l10n_br_fiscal.cnae",
@@ -287,6 +302,12 @@ class ResCompany(models.Model):
         domain=[("tax_domain", "=", TAX_DOMAIN_INSS_WH)],
     )
 
+    tax_classification_id = fields.Many2one(
+        comodel_name="l10n_br_fiscal.tax.classification",
+        string="Default Tax Classification",
+        domain=[("tax_ibs_id", "!=", False), ("tax_cbs_id", "!=", False)],
+    )
+
     tax_definition_ids = fields.One2many(
         comodel_name="l10n_br_fiscal.tax.definition",
         inverse_name="company_id",
@@ -379,6 +400,7 @@ class ResCompany(models.Model):
             self.tax_icms_id = False
 
         self._onchange_piscofins_id()
+        self._onchange_tax_classification_id()
         self._onchange_ripi()
         self._onchange_tax_ipi_id()
         self._onchange_tax_icms_id()
@@ -504,3 +526,12 @@ class ResCompany(models.Model):
             self._set_tax_definition(self.tax_inss_wh_id)
         else:
             self._del_tax_definition(TAX_DOMAIN_INSS_WH)
+
+    @api.onchange("tax_classification_id")
+    def _onchange_tax_classification_id(self):
+        if self.tax_classification_id:
+            self._set_tax_definition(self.tax_classification_id.tax_cbs_id)
+            self._set_tax_definition(self.tax_classification_id.tax_ibs_id)
+        else:
+            self._del_tax_definition(TAX_DOMAIN_CBS)
+            self._del_tax_definition(TAX_DOMAIN_IBS)

@@ -13,6 +13,7 @@ from erpbrasil.base.fiscal import cnpj_cpf
 from erpbrasil.base.fiscal.edoc import ChaveEdoc
 from erpbrasil.transmissao import TransmissaoSOAP
 from lxml import etree
+from nfelib.nfe.bindings.v4_0.dfe_tipos_basicos_v1_00 import TibscbsmonoTot
 from nfelib.nfe.bindings.v4_0.leiaute_nfe_v4_00 import TnfeProc
 from nfelib.nfe.bindings.v4_0.nfe_v4_00 import Nfe
 from nfelib.nfe.ws.edoc_legacy import NFCeAdapter as edoc_nfce
@@ -97,6 +98,7 @@ class NFe(spec_models.StackedModel):
 > <infnfe>
     > <ide>
         ≡ <NFref> l10n_br_fiscal.document.related
+        - <gPagAntecipado>
     - <emit> res.company
     - <avulsa>
     - <dest> res.partner
@@ -128,7 +130,8 @@ class NFe(spec_models.StackedModel):
     - <compra>
     - <cana>
     - <infRespTec> res.partner
-    - <infSolicNFF>"""
+    - <infSolicNFF>
+    - <agropecuario>"""
 
     ##########################
     # NF-e spec related fields
@@ -262,9 +265,15 @@ class NFe(spec_models.StackedModel):
 
     nfe40_finNFe = fields.Selection(related="edoc_purpose")
 
+    nfe40_tpNFDebito = fields.Selection(related="edoc_refund_debit_type")
+
+    nfe40_tpNFCredito = fields.Selection(related="edoc_refund_credit_type")
+
     nfe40_indFinal = fields.Selection(related="ind_final")
 
     nfe40_indPres = fields.Selection(related="ind_pres")
+
+    nfe40_tpEnteGov = fields.Selection(related="public_entity_type")
 
     nfe40_procEmi = fields.Selection(default="0")
 
@@ -550,6 +559,148 @@ class NFe(spec_models.StackedModel):
     nfe40_vTotTrib = fields.Monetary(related="amount_estimate_tax")
 
     ##########################
+    # NF-e tag: IBSCBSTot
+    ##########################
+
+    # IBSCBSTot fields - computed from document lines
+    nfe40_vBCIBSCBS = fields.Monetary(
+        string="Total Base de Calculo IBS/CBS",
+        compute="_compute_nfe40_IBSCBSTot_fields",
+    )
+
+    # gIBS fields
+    nfe40_vIBS = fields.Monetary(
+        string="Valor total do IBS",
+        compute="_compute_nfe40_IBSCBSTot_fields",
+    )
+
+    nfe40_vCredPres = fields.Monetary(
+        string="Total do Crédito Presumido",
+        compute="_compute_nfe40_IBSCBSTot_fields",
+    )
+
+    nfe40_vCredPresCondSus = fields.Monetary(
+        string="Total do Crédito Presumido Condição Suspensiva",
+        compute="_compute_nfe40_IBSCBSTot_fields",
+    )
+
+    # gIBSUF fields
+    nfe40_vDifIBSUF = fields.Monetary(
+        string="Total do Diferimento IBS UF",
+        compute="_compute_nfe40_IBSCBSTot_fields",
+    )
+
+    nfe40_vDevTribIBSUF = fields.Monetary(
+        string="Total de devoluções de tributos IBS UF",
+        compute="_compute_nfe40_IBSCBSTot_fields",
+    )
+
+    nfe40_vIBSUF = fields.Monetary(
+        string="Valor total do IBS Estadual",
+        compute="_compute_nfe40_IBSCBSTot_fields",
+    )
+
+    # gIBSMun fields
+    nfe40_vDifIBSMun = fields.Monetary(
+        string="Total do Diferimento IBS Municipal",
+        compute="_compute_nfe40_IBSCBSTot_fields",
+    )
+
+    nfe40_vDevTribIBSMun = fields.Monetary(
+        string="Total de devoluções de tributos IBS Municipal",
+        compute="_compute_nfe40_IBSCBSTot_fields",
+    )
+
+    nfe40_vIBSMun = fields.Monetary(
+        string="Valor total do IBS Municipal",
+        compute="_compute_nfe40_IBSCBSTot_fields",
+    )
+
+    # gCBS fields
+    nfe40_vDifCBS = fields.Monetary(
+        string="Total do Diferimento CBS",
+        compute="_compute_nfe40_IBSCBSTot_fields",
+    )
+
+    nfe40_vDevTribCBS = fields.Monetary(
+        string="Total de devoluções de tributos CBS",
+        compute="_compute_nfe40_IBSCBSTot_fields",
+    )
+
+    nfe40_vCBS = fields.Monetary(
+        string="Valor total da CBS",
+        compute="_compute_nfe40_IBSCBSTot_fields",
+    )
+
+    nfe40_vCredPresCBS = fields.Monetary(
+        string="Total do Crédito Presumido CBS",
+        compute="_compute_nfe40_IBSCBSTot_fields",
+    )
+
+    nfe40_vCredPresCondSusCBS = fields.Monetary(
+        string="Total do Crédito Presumido Condição Suspensiva CBS",
+        compute="_compute_nfe40_IBSCBSTot_fields",
+    )
+
+    @api.depends(
+        "fiscal_line_ids.ibs_base",
+        "fiscal_line_ids.cbs_base",
+        "fiscal_line_ids.ibs_value",
+        "fiscal_line_ids.cbs_value",
+    )
+    def _compute_nfe40_IBSCBSTot_fields(self):
+        """Compute IBSCBSTot fields from document lines"""
+        for record in self:
+            if not record.fiscal_line_ids:
+                record.nfe40_vBCIBSCBS = 0.0
+                record.nfe40_vIBS = 0.0
+                record.nfe40_vIBSUF = 0.0
+                record.nfe40_vIBSMun = 0.0
+                record.nfe40_vCBS = 0.0
+                record.nfe40_vCredPres = 0.0
+                record.nfe40_vCredPresCondSus = 0.0
+                record.nfe40_vDifIBSUF = 0.0
+                record.nfe40_vDevTribIBSUF = 0.0
+                record.nfe40_vDifIBSMun = 0.0
+                record.nfe40_vDevTribIBSMun = 0.0
+                record.nfe40_vDifCBS = 0.0
+                record.nfe40_vDevTribCBS = 0.0
+                record.nfe40_vCredPresCBS = 0.0
+                record.nfe40_vCredPresCondSusCBS = 0.0
+                continue
+
+            # Calculate totals from lines
+            total_ibs_base = (
+                sum(record.fiscal_line_ids.mapped("ibs_base"))
+                or sum(record.fiscal_line_ids.mapped("cbs_base"))
+                or sum(record.fiscal_line_ids.mapped("price_gross"))
+            )
+
+            total_ibs_value = sum(record.fiscal_line_ids.mapped("ibs_value"))
+            total_cbs_value = sum(record.fiscal_line_ids.mapped("cbs_value"))
+
+            # Calculate IBS UF and Municipal (simplified)
+            # In a complete implementation, these should be calculated separately
+            total_ibs_uf = total_ibs_value  # Simplified
+            total_ibs_mun = 0.0  # Simplified
+
+            record.nfe40_vBCIBSCBS = total_ibs_base
+            record.nfe40_vIBS = total_ibs_value
+            record.nfe40_vIBSUF = total_ibs_uf
+            record.nfe40_vIBSMun = total_ibs_mun
+            record.nfe40_vCBS = total_cbs_value
+            record.nfe40_vCredPres = 0.0
+            record.nfe40_vCredPresCondSus = 0.0
+            record.nfe40_vDifIBSUF = 0.0
+            record.nfe40_vDevTribIBSUF = 0.0
+            record.nfe40_vDifIBSMun = 0.0
+            record.nfe40_vDevTribIBSMun = 0.0
+            record.nfe40_vDifCBS = 0.0
+            record.nfe40_vDevTribCBS = 0.0
+            record.nfe40_vCredPresCBS = 0.0
+            record.nfe40_vCredPresCondSusCBS = 0.0
+
+    ##########################
     # NF-e tag: ISSQNtot
     ##########################
 
@@ -663,6 +814,58 @@ class NFe(spec_models.StackedModel):
         if xsd_field == "nfe40_tpAmb":
             self.env.context = dict(self.env.context)
             self.env.context.update({"tpAmb": self[xsd_field]})
+            return super()._export_field(
+                xsd_field, class_obj, member_spec, export_value
+            )
+
+        if xsd_field == "nfe40_IBSCBSTot":
+            total_ibs = sum(self.fiscal_line_ids.mapped("ibs_value"))
+            total_cbs = sum(self.fiscal_line_ids.mapped("cbs_value"))
+
+            if not total_ibs and not total_cbs:
+                return False
+
+            # Build gIBSUF
+            gibsuf = TibscbsmonoTot.GIbs.GIbsuf(
+                vDif=f"{self.nfe40_vDifIBSUF:.2f}",
+                vDevTrib=f"{self.nfe40_vDevTribIBSUF:.2f}",
+                vIBSUF=f"{self.nfe40_vIBSUF:.2f}",
+            )
+
+            # Build gIBSMun
+            gibsmun = TibscbsmonoTot.GIbs.GIbsmun(
+                vDif=f"{self.nfe40_vDifIBSMun:.2f}",
+                vDevTrib=f"{self.nfe40_vDevTribIBSMun:.2f}",
+                vIBSMun=f"{self.nfe40_vIBSMun:.2f}",
+            )
+
+            # Build gIBS
+            gibs = TibscbsmonoTot.GIbs(
+                gIBSUF=gibsuf,
+                gIBSMun=gibsmun,
+                vIBS=f"{self.nfe40_vIBS:.2f}",
+                vCredPres=f"{self.nfe40_vCredPres:.2f}",
+                vCredPresCondSus=f"{self.nfe40_vCredPresCondSus:.2f}",
+            )
+
+            # Build gCBS
+            gcbs = TibscbsmonoTot.GCbs(
+                vDif=f"{self.nfe40_vDifCBS:.2f}",
+                vDevTrib=f"{self.nfe40_vDevTribCBS:.2f}",
+                vCBS=f"{self.nfe40_vCBS:.2f}",
+                vCredPres=f"{self.nfe40_vCredPresCBS:.2f}",
+                vCredPresCondSus=f"{self.nfe40_vCredPresCondSusCBS:.2f}",
+            )
+
+            # Build IBSCBSTot
+            ibscbs_tot = TibscbsmonoTot(
+                vBCIBSCBS=f"{self.nfe40_vBCIBSCBS:.2f}",
+                gIBS=gibs,
+                gCBS=gcbs,
+            )
+
+            return ibscbs_tot
+
         return super()._export_field(xsd_field, class_obj, member_spec, export_value)
 
     def _export_many2one(self, field_name, xsd_required, class_obj=None):
@@ -677,6 +880,12 @@ class NFe(spec_models.StackedModel):
                 for t in self.nfe40_det.mapped("product_id.tax_icms_or_issqn")
             ):
                 return False
+
+            if field_name == "nfe40_IBSCBSTot":
+                total_ibs = sum(self.fiscal_line_ids.mapped("ibs_value"))
+                total_cbs = sum(self.fiscal_line_ids.mapped("cbs_value"))
+                if not total_ibs and not total_cbs:
+                    return False
 
             elif (not xsd_required) and field_name not in ["nfe40_enderDest"]:
                 comodel = self.env[
@@ -831,7 +1040,7 @@ class NFe(spec_models.StackedModel):
 
     @api.constrains("document_type", "state_edoc", "fiscal_line_ids")
     def _check_product_default_code(self):
-        for rec in self:
+        for rec in self.filtered(filter_processador_edoc_nfe):
             if (
                 rec.document_type in PRODUCT_CODE_FISCAL_DOCUMENT_TYPES
                 and rec.state_edoc == "a_enviar"
@@ -841,28 +1050,24 @@ class NFe(spec_models.StackedModel):
                         raise ValidationError(
                             _(
                                 f"The product {line.product_id.display_name} "
-                                f"must have a default code or the product code"
+                                f"must have a default code or the product code "
                                 f"line field (nfe40_cProd) should be filled."
                             )
                         )
 
     @api.constrains("document_date", "document_key", "state_edoc")
     def _check_document_date_key(self):
-        for rec in self:
-            if rec.document_key:
+        for rec in self.filtered(filter_processador_edoc_nfe):
+            if rec.document_key and rec.document_date:
                 key_date_str = rec.document_key[2:6]
                 key_date = datetime.strptime(key_date_str, "%y%m")
 
                 document_date = fields.Datetime.context_timestamp(
                     rec, rec.document_date
                 )
-                if (
-                    rec.document_type in ["55", "65"]
-                    and rec.state_edoc in ["a_enviar", "autorizada"]
-                    and (
-                        key_date.year != document_date.year
-                        or key_date.month != document_date.month
-                    )
+                if rec.state_edoc in ["a_enviar", "autorizada"] and (
+                    key_date.year != document_date.year
+                    or key_date.month != document_date.month
                 ):
                     raise ValidationError(
                         _(

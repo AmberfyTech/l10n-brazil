@@ -5,7 +5,7 @@
     "name": "NFS-e (Nota Paulistana)",
     "summary": """
         NFS-e (Nota Paulistana)""",
-    "version": "14.0.1.1.7",
+    "version": "14.0.1.4.0",
     "license": "AGPL-3",
     "author": "KMEE, Odoo Community Association (OCA)",
     "maintainers": ["gabrielcardoso21", "mileo", "luismalta"],
@@ -13,13 +13,17 @@
     "website": "https://github.com/OCA/l10n-brazil",
     "external_dependencies": {
         "python": [
-            "erpbrasil.assinatura>=1.7.0",
-            "erpbrasil.transmissao>=1.1.0",
-            "erpbrasil.base>=2.3.0",
+            "erpbrasil.edoc",
+            "erpbrasil.assinatura",
+            "erpbrasil.transmissao",
+            "erpbrasil.base",
             "nfselib.paulistana",
             "unidecode",
         ],
     },
+    "data": [
+        "views/document_view.xml",
+    ],
     "depends": [
         "l10n_br_nfse",
     ],

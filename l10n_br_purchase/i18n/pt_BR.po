@@ -114,6 +114,38 @@ msgid "Buyer Presence"
 msgstr "Presença do Comprador"
 
 #. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__cbs_percent
+msgid "CBS %"
+msgstr ""
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__cbs_reduction
+msgid "CBS % Reduction"
+msgstr ""
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order__amount_cbs_base
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__cbs_base
+msgid "CBS Base"
+msgstr ""
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__cbs_base_type
+msgid "CBS Base Type"
+msgstr ""
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__cbs_cst_code
+msgid "CBS CST Code"
+msgstr ""
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order__amount_cbs_value
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__cbs_value
+msgid "CBS Value"
+msgstr ""
+
+#. module: l10n_br_purchase
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__cest_id
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_report__cest_id
 #: model_terms:ir.ui.view,arch_db:l10n_br_purchase.l10n_br_purchase_report_search
@@ -306,6 +338,11 @@ msgid "CSLL Value"
 msgstr "Valor CSLL"
 
 #. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__cbs_cst_id
+msgid "CST CBS"
+msgstr ""
+
+#. module: l10n_br_purchase
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__cofins_cst_id
 msgid "CST COFINS"
 msgstr "CST COFINS"
@@ -314,6 +351,11 @@ msgstr "CST COFINS"
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__cofinsst_cst_id
 msgid "CST COFINS ST"
 msgstr "CST COFINS ST"
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__ibs_cst_id
+msgid "CST IBS"
+msgstr ""
 
 #. module: l10n_br_purchase
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__icms_cst_id
@@ -341,6 +383,13 @@ msgid "City Taxation Code"
 msgstr "Código de Tributação da Cidade"
 
 #. module: l10n_br_purchase
+#: model:ir.model.fields,help:l10n_br_purchase.field_purchase_order_line__city_taxation_code_id
+msgid ""
+"City Taxation Code for Municipal NFS-e or ISS Municipal Taxation Code for "
+"National NFS-e."
+msgstr ""
+
+#. module: l10n_br_purchase
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order__comment_ids
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__comment_ids
 msgid "Comments"
@@ -365,6 +414,11 @@ msgstr "Tipo de Empresa"
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order__company_country_id
 msgid "Country"
 msgstr "País"
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__cst_code_prefix_like
+msgid "Cst Code Prefix Like"
+msgstr ""
 
 #. module: l10n_br_purchase
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order__currency_id
@@ -588,6 +642,43 @@ msgstr "Bruto"
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__price_gross
 msgid "Gross Product/Service Amount"
 msgstr "Valor Bruto do Produto/Serviço"
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,help:l10n_br_purchase.field_purchase_order_line__cst_code_prefix_like
+msgid "Helper field to filter taxes by CST code prefix (3 chars) using LIKE."
+msgstr ""
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__ibs_percent
+msgid "IBS %"
+msgstr ""
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__ibs_reduction
+msgid "IBS % Reduction"
+msgstr ""
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order__amount_ibs_base
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__ibs_base
+msgid "IBS Base"
+msgstr ""
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__ibs_base_type
+msgid "IBS Base Type"
+msgstr ""
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__ibs_cst_code
+msgid "IBS CST Code"
+msgstr ""
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order__amount_ibs_value
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__ibs_value
+msgid "IBS Value"
+msgstr ""
 
 #. module: l10n_br_purchase
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__icms_percent
@@ -984,6 +1075,11 @@ msgid "IRPJ Value"
 msgstr "Valor do IRPJ"
 
 #. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__national_taxation_code_id
+msgid "ISS National Taxation Code"
+msgstr ""
+
+#. module: l10n_br_purchase
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__issqn_percent
 msgid "ISSQN %"
 msgstr "% ISSQN"
@@ -1225,6 +1321,11 @@ msgid "National Simple Taxes without ICMS"
 msgstr "Impostos do Simples Nacional sem ICMS"
 
 #. module: l10n_br_purchase
+#: model:ir.model.fields,help:l10n_br_purchase.field_purchase_order_line__national_taxation_code_id
+msgid "National Taxation Code for the ISS tax (National NFS-e)"
+msgstr ""
+
+#. module: l10n_br_purchase
 #: model_terms:ir.ui.view,arch_db:l10n_br_purchase.l10n_br_purchase_order_form
 msgid "Notes"
 msgstr "Observações"
@@ -1234,6 +1335,11 @@ msgstr "Observações"
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__fiscal_operation_id
 msgid "Operation"
 msgstr "Operação"
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__operation_indicator_id
+msgid "Operation Indicator"
+msgstr ""
 
 #. module: l10n_br_purchase
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__fiscal_operation_line_id
@@ -1513,6 +1619,11 @@ msgid "Tax Benefit Code"
 msgstr "Código do Benefício Fiscal"
 
 #. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__cbs_tax_id
+msgid "Tax CBS"
+msgstr ""
+
+#. module: l10n_br_purchase
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__cofins_tax_id
 msgid "Tax COFINS"
 msgstr "Imposto COFINS"
@@ -1538,9 +1649,19 @@ msgid "Tax CSLL RET"
 msgstr "Imposto CSLL RET"
 
 #. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__tax_classification_id
+msgid "Tax Classification"
+msgstr ""
+
+#. module: l10n_br_purchase
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__tax_framework
 msgid "Tax Framework"
 msgstr "Estrutura Tributária"
+
+#. module: l10n_br_purchase
+#: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__ibs_tax_id
+msgid "Tax IBS"
+msgstr ""
 
 #. module: l10n_br_purchase
 #: model:ir.model.fields,field_description:l10n_br_purchase.field_purchase_order_line__icms_tax_id
@@ -1834,8 +1955,8 @@ msgstr ""
 #~ "        % if object.partner_ref:\n"
 #~ "            with reference: ${object.partner_ref}\n"
 #~ "        % endif\n"
-#~ "        amounting in <strong>${format_amount(object.amount_total, object."
-#~ "currency_id)}</strong>\n"
+#~ "        amounting in <strong>${format_amount(object.amount_total, "
+#~ "object.currency_id)}</strong>\n"
 #~ "        from ${object.company_id.name}.\n"
 #~ "        <br/><br/>\n"
 #~ "        If you have any questions, please do not hesitate to contact us.\n"
@@ -1856,8 +1977,8 @@ msgstr ""
 #~ "        % if object.partner_ref:\n"
 #~ "            com a referencia: ${object.partner_ref}\n"
 #~ "        % endif\n"
-#~ "        no valor de <strong>${format_amount(object.amount_total, object."
-#~ "currency_id)}</strong>\n"
+#~ "        no valor de <strong>${format_amount(object.amount_total, "
+#~ "object.currency_id)}</strong>\n"
 #~ "        de ${object.company_id.name}.\n"
 #~ "        <br/><br/>\n"
 #~ "        Se tiver alguma dúvida, não hesite em contactar-nos.\n"
@@ -1874,8 +1995,8 @@ msgstr ""
 #~ "            (${object.partner_id.parent_id.name})\n"
 #~ "        % endif\n"
 #~ "        <br/><br/>\n"
-#~ "        Here is in attachment a request for quotation <strong>${object."
-#~ "name}</strong>\n"
+#~ "        Here is in attachment a request for quotation <strong>$"
+#~ "{object.name}</strong>\n"
 #~ "        % if object.partner_ref:\n"
 #~ "            with reference: ${object.partner_ref}\n"
 #~ "        % endif\n"
@@ -2692,8 +2813,8 @@ msgstr ""
 #~ msgstr "Unidade de Medida referencial"
 
 #~ msgid ""
-#~ "Reference of the document that generated this purchase order request (e."
-#~ "g. a sales order)"
+#~ "Reference of the document that generated this purchase order request "
+#~ "(e.g. a sales order)"
 #~ msgstr ""
 #~ "Referência do documento que gerou o requerimento para essa ordem de "
 #~ "compra (ex.: uma ordem de compra)"

@@ -254,13 +254,22 @@
         sequence="10"
     />
 
+    <!-- Legal Nature -->
+    <menuitem
+        id="legal_nature_menu"
+        action="legal_nature_action"
+        groups="l10n_br_fiscal.group_manager"
+        parent="partners_config_menu"
+        sequence="10"
+    />
+
     <!-- CNAE -->
     <menuitem
         id="cnae_menu"
         action="cnae_action"
         groups="l10n_br_fiscal.group_manager"
         parent="partners_config_menu"
-        sequence="10"
+        sequence="20"
     />
 
     <!-- Partner Profile -->
@@ -371,6 +380,23 @@
         sequence="30"
     />
 
+    <!-- Tax Classification -->
+    <menuitem
+        id="tax_classification_menu"
+        action="tax_classification_action"
+        groups="l10n_br_fiscal.group_manager"
+        parent="taxes_config_menu"
+        sequence="30"
+    />
+    <!-- Operation Indicator -->
+    <menuitem
+        id="operation_indicator_menu"
+        action="operation_indicator_action"
+        groups="l10n_br_fiscal.group_manager"
+        parent="taxes_config_menu"
+        sequence="30"
+    />
+
     <!-- Tax ICMS Settings -->
     <menuitem
         id="tax_icms_config_menu"
@@ -414,6 +440,15 @@
         groups="l10n_br_fiscal.group_manager"
         parent="tax_issqn_config_menu"
         sequence="10"
+    />
+
+    <!-- National Taxation Code-->
+    <menuitem
+        id="national_taxation_code_menu"
+        action="national_taxation_code_action"
+        groups="l10n_br_fiscal.group_manager"
+        parent="tax_issqn_config_menu"
+        sequence="11"
     />
 
     <!-- Tax IPI Settings -->

@@ -17,7 +17,7 @@ class ProductProduct(spec_models.SpecModel):
 
     mdfe30_cEAN = fields.Char(related="barcode")
 
-    mdfe30_NCM = fields.Char(string="ncm_id.code")
+    mdfe30_NCM = fields.Char(related="ncm_id.code_unmasked")
 
     mdfe30_tpCarga = fields.Selection(default="05")
 
@@ -28,6 +28,8 @@ class MDFeProductLotacao(spec_models.SpecModel):
     _name = "l10n_br_mdfe.product.lotacao"
     _inherit = "mdfe.30.inflotacao"
     _description = "Informações De Lotação MDFe"
+
+    product_id = fields.Many2one(comodel_name="product.product")
 
     mdfe30_infLocalCarrega = fields.Many2one(
         comodel_name="l10n_br_mdfe.product.lotacao.local",

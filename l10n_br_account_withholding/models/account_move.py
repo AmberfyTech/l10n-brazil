@@ -77,8 +77,22 @@ class AccountMove(models.Model):
         """
         wh_date_invoice = move_line.move_id.date
         wh_due_invoice = wh_date_invoice.replace(day=fiscal_group.wh_due_day)
+
+        if fiscal_group.tax_scope == "city":
+            city_id = (
+                self.invoice_line_ids[0].issqn_fg_city_id
+                if self.invoice_line_ids[0].issqn_fg_city_id
+                else self.partner_id.city_id
+            )
+            partner_wh = self.env["res.partner"].search(
+                [("city_id", "=", city_id.id), ("wh_cityhall", "=", True)], limit=1
+            )
+            partner_id = partner_wh if partner_wh else fiscal_group.partner_id
+        else:
+            partner_id = fiscal_group.partner_id
+
         values = {
-            "partner_id": fiscal_group.partner_id.id,
+            "partner_id": partner_id.id,
             "date": wh_date_invoice,
             "invoice_date": wh_date_invoice,
             "invoice_date_due": wh_due_invoice + relativedelta(months=1),
@@ -128,6 +142,14 @@ class AccountMove(models.Model):
                         wh_invoice = self.env["account.move"].create(
                             self._prepare_wh_invoice(line, fiscal_group)
                         )
+                        if fiscal_group.wh_payable_account_id:
+                            payable_lines = wh_invoice.line_ids.filtered(
+                                lambda line: line.account_id.internal_type == "payable"
+                            )
+
+                            payable_lines.write(
+                                {"account_id": fiscal_group.wh_payable_account_id.id}
+                            )
                         wh_invoice.message_post_with_view(
                             "mail.message_origin_link",
                             values={"self": wh_invoice, "origin": move},

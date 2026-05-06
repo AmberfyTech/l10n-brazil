@@ -4,7 +4,7 @@
 {
     "name": "MDFe",
     "summary": """Brazilian Eletronic Invoice MDF-e""",
-    "version": "14.0.1.1.1",
+    "version": "14.0.1.9.0",
     "category": "Localisation",
     "license": "AGPL-3",
     "author": "KMEE,Escodoo,Odoo Community Association (OCA)",
@@ -35,6 +35,8 @@
         "views/modal/modal_ferroviario.xml",
         # Report
         "report/damdfe_report.xml",
+        # Wizards
+        "wizards/document_closure_wizard.xml",
     ],
     "demo": [
         "demo/fiscal_document_demo.xml",
@@ -45,9 +47,9 @@
     "auto_install": False,
     "external_dependencies": {
         "python": [
-            "nfelib<=2.0.7",
-            "erpbrasil.transmissao>=1.1.0",
-            "erpbrasil.edoc>=2.5.2",
+            "nfelib",
+            "erpbrasil.transmissao",
+            "erpbrasil.edoc",
         ]
     },
 }

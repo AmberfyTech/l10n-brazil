@@ -6,7 +6,7 @@ from odoo import fields, models
 
 
 class FiscalDocumentMixin(models.AbstractModel):
-    _inherit = "l10n_br_fiscal.document.mixin.fields"
+    _inherit = "l10n_br_fiscal.document.mixin"
 
     def _get_default_incoterm(self):
         return self.env.company.incoterm_id
@@ -18,13 +18,6 @@ class FiscalDocumentMixin(models.AbstractModel):
         help="International Commercial Terms are a series of"
         " predefined commercial terms used in international"
         " transactions.",
-    )
-
-    # proxy fields to enable writing the related (shadowed) fields
-    # to the fiscal doc line from the aml through the _inherits system
-    # despite they have the same names.
-    fiscal_proxy_incoterm_id = fields.Many2one(
-        string="Fiscal Proxy Incoterm", related="incoterm_id"
     )
 
     carrier_id = fields.Many2one(

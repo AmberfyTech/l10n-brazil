@@ -15,6 +15,23 @@
         </field>
     </record>
 
+    <!-- Legal Nature -->
+    <record id="legal_nature_action" model="ir.actions.act_window">
+        <field name="name">Legal Nature</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">l10n_br_fiscal.legal.nature</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="legal_nature_tree" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+              Add a new Legal Nature
+            </p><p>
+              A Legal nature is necessary to determine the
+              fiscal definitions for your company.
+            </p>
+        </field>
+    </record>
+
     <!-- CNAE -->
     <record id="cnae_action" model="ir.actions.act_window">
         <field name="name">CNAE</field>
@@ -389,6 +406,21 @@
         </field>
     </record>
 
+    <!-- Tax Classification -->
+
+    <record id="tax_classification_action" model="ir.actions.act_window">
+        <field name="name">Tax Classification</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">l10n_br_fiscal.tax.classification</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="tax_classification_tree" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add a new Tax Classification</p>
+            <p
+            >A Tax Classification is necessary to create fiscal operations for your fiscal moves.</p>
+        </field>
+    </record>
+
     <!-- Simplefied Tax -->
     <record id="simplified_tax_action" model="ir.actions.act_window">
         <field name="name">Simplified Tax</field>
@@ -682,6 +714,28 @@
         <field name="name">City Taxation Code</field>
         <field name="res_model">l10n_br_fiscal.city.taxation.code</field>
         <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="national_taxation_code_action" model="ir.actions.act_window">
+        <field name="name">National Taxation Code</field>
+        <field name="res_model">l10n_br_fiscal.national.taxation.code</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <!-- Operation Indicator -->
+
+    <record id="operation_indicator_action" model="ir.actions.act_window">
+        <field name="name">Operation Indicator</field>
+        <field name="res_model">l10n_br_fiscal.operation.indicator</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create an Operation Indicator record
+            </p>
+            <p>
+                Operation Indicators are used to categorize consumption
+                operations.
+            </p>
+        </field>
     </record>
 
 </odoo>

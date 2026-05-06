@@ -4,7 +4,7 @@
 
 {
     "name": "Brazilian Payment Order",
-    "version": "14.0.9.0.2",
+    "version": "14.0.9.4.2",
     "license": "AGPL-3",
     "author": "KMEE, Akretion, Odoo Community Association (OCA)",
     "maintainers": ["mbcosta"],
@@ -27,6 +27,7 @@
         # CNAB Mov. Instruction and Return Codes
         "data/cnab_codes/banco_bradesco_cnab_240_400.xml",
         "data/cnab_codes/banco_cef_cnab_240.xml",
+        "data/cnab_codes/banco_do_brasil_cnab_240.xml",
         "data/cnab_codes/banco_do_brasil_cnab_400.xml",
         "data/cnab_codes/banco_itau_cnab_240_400.xml",
         "data/cnab_codes/banco_sicred_cnab_240.xml",
@@ -43,9 +44,12 @@
         "data/cnab_codes/banco_santander_240_boleto_discount_code.xml",
         "data/cnab_codes/banco_sicredi_240_boleto_discount_code.xml",
         "data/cnab_codes/banco_unicred_240_400_boleto_discount_code.xml",
+        # Boleto Write Off Devolution
+        "data/cnab_codes/banco_santander_240_boleto_write_off_devolution.xml",
         # Wizards
         "wizards/account_payment_line_create_view.xml",
         "wizards/account_move_line_change.xml",
+        "wizards/account_move_payment_mode.xml",
         # Views
         "views/account_journal.xml",
         "views/account_payment_order.xml",
@@ -75,7 +79,7 @@
     "installable": True,
     "external_dependencies": {
         "python": [
-            "erpbrasil.base>=2.3.0",
+            "erpbrasil.base",
         ]
     },
 }

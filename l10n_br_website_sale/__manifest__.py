@@ -5,7 +5,7 @@
     "name": "L10n Br Website Sale",
     "summary": """
         Website sale localização brasileira.""",
-    "version": "14.0.2.0.2",
+    "version": "14.0.2.1.2",
     "development_status": "Beta",
     "license": "AGPL-3",
     "author": "KMEE, Odoo Community Association (OCA)",
@@ -21,7 +21,7 @@
     ],
     "external_dependencies": {
         "python": [
-            "erpbrasil.base>=2.3.0",
+            "erpbrasil.base",
         ]
     },
 }

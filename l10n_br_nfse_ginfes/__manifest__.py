@@ -5,7 +5,7 @@
     "name": "NFS-e (Ginfes)",
     "summary": """
         NFS-e (Ginfes)""",
-    "version": "14.0.1.1.0",
+    "version": "14.0.1.3.0",
     "license": "AGPL-3",
     "author": "KMEE, Odoo Community Association (OCA)",
     "maintainers": ["gabrielcardoso21", "mileo", "luismalta"],
@@ -13,10 +13,10 @@
     "development_status": "Beta",
     "external_dependencies": {
         "python": [
-            "erpbrasil.edoc>=2.5.2",
-            "erpbrasil.assinatura>=1.7.0",
-            "erpbrasil.transmissao>=1.1.0",
-            "erpbrasil.base>=2.3.0",
+            "erpbrasil.edoc",
+            "erpbrasil.assinatura",
+            "erpbrasil.transmissao",
+            "erpbrasil.base",
             "nfselib.ginfes",
         ],
     },

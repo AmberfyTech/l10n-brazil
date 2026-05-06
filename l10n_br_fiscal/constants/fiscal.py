@@ -89,6 +89,9 @@ TAX_DOMAIN_COFINS_ST = "cofinsst"
 TAX_DOMAIN_COFINS_WH = "cofins_wh"
 TAX_DOMAIN_ISSQN = "issqn"
 TAX_DOMAIN_ISSQN_WH = "issqn_wh"
+TAX_DOMAIN_IBS = "ibs"
+TAX_DOMAIN_CBS = "cbs"
+TAX_DOMAIN_IS = "is"
 TAX_DOMAIN_CSLL = "csll"
 TAX_DOMAIN_CSLL_WH = "csll_wh"
 TAX_DOMAIN_IR = "ir"
@@ -121,6 +124,9 @@ TAX_DOMAIN = [
     (TAX_DOMAIN_COFINS_WH, "COFINS WH"),
     (TAX_DOMAIN_ISSQN, "ISSQN"),
     (TAX_DOMAIN_ISSQN_WH, "ISSQN WH"),
+    (TAX_DOMAIN_IBS, "IBS"),
+    (TAX_DOMAIN_CBS, "CBS"),
+    (TAX_DOMAIN_IS, "IS"),
     (TAX_DOMAIN_IR, "IR"),
     (TAX_DOMAIN_IRPJ, "IRPJ"),
     (TAX_DOMAIN_IRPJ_WH, "IRPJ WH"),
@@ -307,6 +313,14 @@ FINAL_CUSTOMER_NO = "0"
 FINAL_CUSTOMER_YES = "1"
 
 
+PUBLIC_ENTIRY_TYPE = [
+    ("1", "União"),
+    ("2", "Estado"),
+    ("3", "Distrito Federal"),
+    ("4", "Município"),
+]
+
+
 CFOP_TYPE_MOVE = [
     ("purchase_industry", "Purchase Industry"),
     ("purchase_commerce", "Purchase Commerce"),
@@ -358,6 +372,7 @@ LOTE_RECEBIDO = ["103"]
 LOTE_PROCESSADO = ["104"]
 LOTE_EM_PROCESSAMENTO = ["105"]
 SERVICO_PARALIZADO = ("108", "109")
+ENCERRADO = ["132", "135"]
 
 CANCELAMENTO_HOMOLOGADO = ["101", "151"]
 
@@ -381,6 +396,7 @@ SITUACAO_EDOC_AUTORIZADA = "autorizada"
 SITUACAO_EDOC_CANCELADA = "cancelada"
 SITUACAO_EDOC_DENEGADA = "denegada"
 SITUACAO_EDOC_INUTILIZADA = "inutilizada"
+SITUACAO_EDOC_ENCERRADA = "encerrada"
 
 
 SITUACAO_EDOC = [
@@ -392,6 +408,7 @@ SITUACAO_EDOC = [
     (SITUACAO_EDOC_CANCELADA, "Cancelada"),
     (SITUACAO_EDOC_DENEGADA, "Denegada"),
     (SITUACAO_EDOC_INUTILIZADA, "Inutilizada"),
+    (SITUACAO_EDOC_ENCERRADA, "Encerrada"),
 ]
 SITUACAO_EDOC_DICT = dict(SITUACAO_EDOC)
 
@@ -477,12 +494,27 @@ EDOC_PURPOSE = [
     ("2", "Complementar"),
     ("3", "Ajuste"),
     ("4", "Devolução de mercadoria"),
+    ("5", "Nota de Crédito"),
+    ("6", "Nota de Débito"),
 ]
 
 EDOC_PURPOSE_NORMAL = "1"
 EDOC_PURPOSE_COMPLEMENTAR = "2"
 EDOC_PURPOSE_AJUSTE = "3"
 EDOC_PURPOSE_DEVOLUCAO = "4"
+
+EDOC_REFUND_DEBIT_TYPE = [
+    ("01", "Transferência de créditos para Cooperativas"),
+    ("02", "Anulação de Crédito por Saídas Imunes/Isentas"),
+    ("03", "Débitos de notas fiscais não processadas na apuração"),
+    ("04", "Multa e juros"),
+    ("05", "Transferência de crédito de sucessão"),
+]
+
+# TODO - Implementar nas proximas versões da NT da Reforma tributária
+EDOC_REFUND_CREDIT_TYPE = [
+    ("00", "Não Implementado"),
+]
 
 PROCESSADOR_NENHUM = "nenhum"
 PROCESSADOR_OCA = "oca"
@@ -528,3 +560,13 @@ FISCAL_PAYMENT_MODE = [
     ("90", "90 - Sem Pagamento"),
     ("99", "99 - Outros"),
 ]
+
+TAX_RATE_TYPE = [
+    ("1", "1 - Fixa"),
+    ("2", "2 - Padrão"),
+    ("3", "3 - Sem Alíquota"),
+    ("4", "4 - Uniforme Nacional"),
+    ("5", "5 - Uniforme Setorial"),
+]
+
+TAX_RATE_TYPE_DEFAULT = "2"

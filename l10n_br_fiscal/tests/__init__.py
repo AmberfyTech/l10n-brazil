@@ -5,6 +5,7 @@ from . import (
     test_fiscal_document_generic,
     test_fiscal_document_nfse,
     test_fiscal_tax,
+    test_tax_classification,
     test_tax_benefit,
     test_ibpt_product,
     test_ibpt_service,
@@ -15,4 +16,5 @@ from . import (
     test_subsequent_operation,
     test_uom_uom,
     test_operation,
+    test_document_email,
 )

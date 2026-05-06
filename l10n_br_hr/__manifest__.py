@@ -7,7 +7,7 @@
     "category": "Localization",
     "author": "KMEE, " "Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/l10n-brazil",
-    "version": "14.0.1.5.1",
+    "version": "14.0.1.5.3",
     "depends": ["hr", "l10n_br_base"],
     "data": [
         "data/l10n_br_hr.cbo.csv",
@@ -30,7 +30,7 @@
     "license": "AGPL-3",
     "external_dependencies": {
         "python": [
-            "erpbrasil.base>=2.3.0",
+            "erpbrasil.base",
         ]
     },
 }

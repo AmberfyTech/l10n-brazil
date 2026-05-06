@@ -10,7 +10,7 @@
     "maintainers": ["renatonlima"],
     "website": "https://github.com/OCA/l10n-brazil",
     "development_status": "Production/Stable",
-    "version": "14.0.23.14.0",
+    "version": "14.0.28.1.2",
     "depends": [
         "product",
         "l10n_br_base",
@@ -36,9 +36,15 @@
         "data/l10n_br_fiscal.tax.csv",
         "data/l10n_br_fiscal.tax.pis.cofins.csv",
         "data/l10n_br_fiscal_server_action.xml",
+        "data/l10n_br_fiscal.tax.classification.csv",
+        "data/l10n_br_fiscal.operation.indicator.csv",
         "data/ir_cron.xml",
         "data/l10n_br_fiscal_comment_data.xml",
+        "data/l10n_br_fiscal.legal.nature.csv",
         # Views
+        "views/tax_classification.xml",
+        "views/operation_indicator_view.xml",
+        "views/legal_nature_view.xml",
         "views/cnae_view.xml",
         "views/cfop_view.xml",
         "views/comment_view.xml",
@@ -67,6 +73,7 @@
         "views/simplified_tax_range_view.xml",
         "views/operation_view.xml",
         "views/operation_line_view.xml",
+        "views/operation_indicator_view.xml",
         "views/product_template_view.xml",
         "views/product_product_view.xml",
         "views/tax_estimate_view.xml",
@@ -83,6 +90,7 @@
         "views/uom_uom.xml",
         "views/invalidate_number_view.xml",
         "views/city_taxation_code.xml",
+        "views/national_taxation_code.xml",
         "views/operation_dashboard_view.xml",
         # Actions
         "views/l10n_br_fiscal_action.xml",
@@ -98,7 +106,7 @@
     "auto_install": False,
     "external_dependencies": {
         "python": [
-            "erpbrasil.base>=2.3.0",
+            "erpbrasil.base",
         ]
     },
 }

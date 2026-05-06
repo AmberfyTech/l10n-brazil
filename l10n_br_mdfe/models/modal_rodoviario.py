@@ -18,7 +18,8 @@ class MDFeModalRodoviario(spec_models.StackedModel):
     _mdfe30_binding_module = "nfelib.mdfe.bindings.v3_0.mdfe_modal_rodoviario_v3_00"
     _mdfe30_stacking_mixin = "mdfe.30.rodo"
     # all m2o at this level will be stacked even if not required:
-    _mdfe30_stacking_force_paths = ["rodo.infANTT", "rodo.infANTT.ValePed"]
+    _mdfe30_stacking_force_paths = ["rodo.infANTT", "rodo.infANTT.InfContratante"]
+    _mdfe30_stacking_skip_paths = ("mdfe30_valePed",)
 
     document_id = fields.Many2one(comodel_name="l10n_br_fiscal.document")
 
@@ -156,7 +157,10 @@ class MDFeModalRodoviarioPagamento(spec_models.StackedModel):
         comodel_name="l10n_br_mdfe.modal.rodoviario.pagamento.prazo"
     )
 
-    mdfe30_vContrato = fields.Monetary(required=True)
+    mdfe30_vContrato = fields.Monetary(
+        required=True,
+        compute="_compute_vcontrato",
+    )
 
     mdfe30_indPag = fields.Selection(required=True)
 
@@ -203,6 +207,11 @@ class MDFeModalRodoviarioPagamento(spec_models.StackedModel):
                     rec.mdfe30_choice_tresponsible = "mdfe30_CPF"
             else:
                 rec.mdfe30_choice_tresponsible = False
+
+    @api.depends("mdfe30_comp.mdfe30_vComp")
+    def _compute_vcontrato(self):
+        for rec in self:
+            rec.mdfe30_vContrato = sum(rec.mdfe30_comp.mapped("mdfe30_vComp"))
 
 
 class MDFeModalRodoviarioPagamentoFrete(spec_models.SpecModel):

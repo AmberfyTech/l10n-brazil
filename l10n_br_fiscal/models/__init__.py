@@ -4,9 +4,7 @@ from . import data_abstract
 from . import data_product_abstract
 from . import data_ncm_nbs_abstract
 from . import document_mixin_methods
-from . import document_mixin_fields
 from . import document_mixin
-from . import document_move_mixin
 from . import document_line_mixin_methods
 from . import document_line_mixin
 from . import invalidate_number
@@ -14,6 +12,7 @@ from . import comment
 from . import ibpt
 from . import cfop
 from . import cst
+from . import legal_nature
 from . import cnae
 from . import nbs
 from . import service_type
@@ -58,4 +57,7 @@ from . import subsequent_operation
 from . import subsequent_document
 from . import document_email
 from . import city_taxation_code
+from . import national_taxation_code
 from . import document_supplement
+from . import tax_classification
+from . import operation_indicator

@@ -77,6 +77,11 @@ class ProductTemplate(models.Model):
         comodel_name="l10n_br_fiscal.city.taxation.code", string="City Taxation Code"
     )
 
+    national_taxation_code_id = fields.Many2one(
+        comodel_name="l10n_br_fiscal.national.taxation.code",
+        string="National Taxation Code",
+    )
+
     fiscal_genre_code = fields.Char(
         related="fiscal_genre_id.code", store=True, string="Fiscal Product Genre Code"
     )
@@ -92,6 +97,10 @@ class ProductTemplate(models.Model):
 
     nbs_id = fields.Many2one(
         comodel_name="l10n_br_fiscal.nbs", index=True, string="NBS"
+    )
+
+    operation_indicator_id = fields.Many2one(
+        comodel_name="l10n_br_fiscal.operation.indicator",
     )
 
     cest_id = fields.Many2one(

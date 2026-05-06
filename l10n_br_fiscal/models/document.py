@@ -16,11 +16,14 @@ from ..constants.fiscal import (
     DOCUMENT_ISSUER_PARTNER,
     EDOC_PURPOSE,
     EDOC_PURPOSE_NORMAL,
+    EDOC_REFUND_CREDIT_TYPE,
+    EDOC_REFUND_DEBIT_TYPE,
     FISCAL_IN_OUT_DICT,
     MODELO_FISCAL_CTE,
     MODELO_FISCAL_NFCE,
     MODELO_FISCAL_NFE,
     MODELO_FISCAL_NFSE,
+    PUBLIC_ENTIRY_TYPE,
     SITUACAO_EDOC,
     SITUACAO_EDOC_AUTORIZADA,
     SITUACAO_EDOC_CANCELADA,
@@ -52,8 +55,7 @@ class Document(models.Model):
 
     _name = "l10n_br_fiscal.document"
     _inherit = [
-        "l10n_br_fiscal.document.mixin.fields",
-        "l10n_br_fiscal.document.move.mixin",
+        "l10n_br_fiscal.document.mixin",
         "mail.thread",
     ]
     _description = "Fiscal Document"
@@ -162,6 +164,21 @@ class Document(models.Model):
         default=EDOC_PURPOSE_NORMAL,
     )
 
+    edoc_refund_debit_type = fields.Selection(
+        selection=EDOC_REFUND_DEBIT_TYPE,
+        string="Tipo de Nota de Débito",
+    )
+
+    edoc_refund_credit_type = fields.Selection(
+        selection=EDOC_REFUND_CREDIT_TYPE,
+        string="Tipo de Nota de Crédito",
+    )
+
+    public_entity_type = fields.Selection(
+        selection=PUBLIC_ENTIRY_TYPE,
+        string="Tipo de Entidade Governamental",
+    )
+
     document_type = fields.Char(
         string="Document Type Code",
         related="document_type_id.code",
@@ -219,6 +236,214 @@ class Document(models.Model):
             ("4", "Outros"),
         ],
         string="Tomador do Serviço",
+    )
+
+    # ----- Now some handy related fields:
+
+    partner_legal_name = fields.Char(
+        string="Legal Name",
+        related="partner_id.legal_name",
+    )
+
+    partner_name = fields.Char(
+        string="Partner Name",
+        related="partner_id.name",
+    )
+
+    partner_cnpj_cpf = fields.Char(
+        string="CNPJ",
+        compute="_compute_partner_cnpj_cpf",
+        store=True,
+    )
+
+    has_vat_specification = fields.Boolean(
+        string="Has VAT Specification",
+        default=False,
+        help="Indicates whether this fiscal document includes a specific "
+        "VAT (CNPJ/CPF) identification that must be preserved — "
+        "commonly known in Brazil as 'CPF na nota'.",
+    )
+
+    partner_inscr_est = fields.Char(
+        string="State Tax Number",
+        related="partner_id.inscr_est",
+    )
+
+    partner_ind_ie_dest = fields.Selection(
+        string="Contribuinte do ICMS",
+        related="partner_id.ind_ie_dest",
+    )
+
+    partner_inscr_mun = fields.Char(
+        string="Municipal Tax Number",
+        related="partner_id.inscr_mun",
+    )
+
+    partner_suframa = fields.Char(
+        string="Suframa",
+        related="partner_id.suframa",
+    )
+
+    partner_cnae_main_id = fields.Many2one(
+        comodel_name="l10n_br_fiscal.cnae",
+        string="Main CNAE",
+        related="partner_id.cnae_main_id",
+    )
+
+    partner_tax_framework = fields.Selection(
+        string="Tax Framework",
+        related="partner_id.tax_framework",
+    )
+
+    partner_street = fields.Char(
+        string="Partner Street",
+        related="partner_id.street",
+    )
+
+    partner_number = fields.Char(
+        string="Partner Number",
+        related="partner_id.street_number",
+    )
+
+    partner_street2 = fields.Char(
+        string="Partner Street2",
+        related="partner_id.street2",
+    )
+
+    partner_district = fields.Char(
+        string="Partner District",
+        related="partner_id.district",
+    )
+
+    partner_country_id = fields.Many2one(
+        comodel_name="res.country",
+        string="Partner Country",
+        related="partner_id.country_id",
+    )
+
+    partner_state_id = fields.Many2one(
+        comodel_name="res.country.state",
+        string="Partner State",
+        related="partner_id.state_id",
+    )
+
+    partner_city_id = fields.Many2one(
+        comodel_name="res.city",
+        string="Partner City",
+        related="partner_id.city_id",
+    )
+
+    partner_zip = fields.Char(
+        string="Partner Zip",
+        related="partner_id.zip",
+    )
+
+    partner_phone = fields.Char(
+        string="Partner Phone",
+        related="partner_id.phone",
+    )
+
+    partner_is_company = fields.Boolean(
+        string="Partner Is Company?",
+        related="partner_id.is_company",
+    )
+
+    processador_edoc = fields.Selection(
+        related="company_id.processador_edoc",
+    )
+
+    company_legal_name = fields.Char(
+        string="Company Legal Name",
+        related="company_id.legal_name",
+    )
+
+    company_name = fields.Char(
+        string="Company Name",
+        size=128,
+        related="company_id.name",
+    )
+
+    company_cnpj_cpf = fields.Char(
+        string="Company CNPJ",
+        related="company_id.cnpj_cpf",
+    )
+
+    company_inscr_est = fields.Char(
+        string="Company State Tax Number",
+        related="company_id.inscr_est",
+    )
+
+    company_inscr_est_st = fields.Char(
+        string="Company ST State Tax Number",
+    )
+
+    company_inscr_mun = fields.Char(
+        string="Company Municipal Tax Number",
+        related="company_id.inscr_mun",
+    )
+
+    company_suframa = fields.Char(
+        string="Company Suframa",
+        related="company_id.suframa",
+    )
+
+    company_cnae_main_id = fields.Many2one(
+        comodel_name="l10n_br_fiscal.cnae",
+        string="Company Main CNAE",
+        related="company_id.cnae_main_id",
+    )
+
+    company_tax_framework = fields.Selection(
+        string="Company Tax Framework",
+        related="company_id.tax_framework",
+    )
+
+    company_street = fields.Char(
+        string="Company Street",
+        related="company_id.street",
+    )
+
+    company_number = fields.Char(
+        string="Company Number",
+        related="company_id.street_number",
+    )
+
+    company_street2 = fields.Char(
+        string="Company Street2",
+        related="company_id.street2",
+    )
+
+    company_district = fields.Char(
+        string="Company District",
+        related="company_id.district",
+    )
+
+    company_country_id = fields.Many2one(
+        comodel_name="res.country",
+        string="Company Country",
+        related="company_id.country_id",
+    )
+
+    company_state_id = fields.Many2one(
+        comodel_name="res.country.state",
+        string="Company State",
+        related="company_id.state_id",
+    )
+
+    company_city_id = fields.Many2one(
+        comodel_name="res.city",
+        string="Company City",
+        related="company_id.city_id",
+    )
+
+    company_zip = fields.Char(
+        string="Company ZIP",
+        related="company_id.zip",
+    )
+
+    company_phone = fields.Char(
+        string="Company Phone",
+        related="company_id.phone",
     )
 
     @api.constrains("document_key")
@@ -363,6 +588,16 @@ class Document(models.Model):
     )
     def _compute_amount(self):
         return super()._compute_amount()
+
+    @api.depends("partner_id", "has_vat_specification")
+    def _compute_partner_cnpj_cpf(self):
+        for record in self:
+            if record.partner_id and not record.has_vat_specification:
+                record.partner_cnpj_cpf = record.partner_id.cnpj_cpf
+            elif not record.partner_id:
+                record.partner_cnpj_cpf = False
+            # if record.has_vat_specification is True, keep current value
+            # (no assignment needed as the field retains its current value)
 
     def unlink(self):
         forbidden_states_unlink = [

@@ -392,9 +392,13 @@ class Tax(models.Model):
             and cfop.destination == CFOP_DESTINATION_EXTERNAL
             and partner.ind_ie_dest == NFE_IND_IE_DEST_9
             and tax_dict.get("tax_value")
-            and operation_line.fiscal_operation_type == FISCAL_OUT
-            or operation_line.fiscal_operation_id.fiscal_type == "return_in"
-            and operation_line.fiscal_operation_type == FISCAL_IN
+            and (
+                operation_line.fiscal_operation_type == FISCAL_OUT
+                or (
+                    operation_line.fiscal_operation_type == FISCAL_IN
+                    and operation_line.fiscal_operation_id.fiscal_type != "return_in"
+                )
+            )
         ):
             icms_tax_difal, _ = company.icms_regulation_id.map_tax_def_icms_difal(
                 company, partner, product, ncm, nbm, cest, operation_line, ind_final
@@ -612,6 +616,54 @@ class Tax(models.Model):
             tax_dict_ii = taxes_dict.get("ii", {})
             tax_dict["add_to_base"] += tax_dict_ii.get("tax_value", 0.00)
 
+        return self._compute_tax(tax, taxes_dict, **kwargs)
+
+    @api.model
+    def _compute_ibs(self, tax, taxes_dict, **kwargs):
+        """The IBS (Tax on Goods and Services) must have the
+        following taxes removed from its calculation base:
+        ICMS, PIS, and COFINS."""
+        tax_dict = taxes_dict.get(tax.tax_domain)
+        tax_dict_icms = taxes_dict.get("icms", {})
+        tax_dict_pis = taxes_dict.get("pis", {})
+        tax_dict_cofins = taxes_dict.get("cofins", {})
+        tax_dict["remove_from_base"] += (
+            tax_dict_icms.get("tax_value", 0.00)
+            + tax_dict_pis.get("tax_value", 0.00)
+            + tax_dict_cofins.get("tax_value", 0.00)
+        )
+        return self._compute_tax(tax, taxes_dict, **kwargs)
+
+    @api.model
+    def _compute_cbs(self, tax, taxes_dict, **kwargs):
+        """The CBS (Contribution on Goods and Services) must have the
+        following taxes removed from its calculation base:
+        ICMS, PIS, and COFINS."""
+        tax_dict = taxes_dict.get(tax.tax_domain)
+        tax_dict_icms = taxes_dict.get("icms", {})
+        tax_dict_pis = taxes_dict.get("pis", {})
+        tax_dict_cofins = taxes_dict.get("cofins", {})
+        tax_dict["remove_from_base"] += (
+            tax_dict_icms.get("tax_value", 0.00)
+            + tax_dict_pis.get("tax_value", 0.00)
+            + tax_dict_cofins.get("tax_value", 0.00)
+        )
+        return self._compute_tax(tax, taxes_dict, **kwargs)
+
+    @api.model
+    def _compute_is(self, tax, taxes_dict, **kwargs):
+        """The IS tax (Selective Tax) must have the
+        following taxes removed from its calculation base:
+        ICMS, PIS, and COFINS."""
+        tax_dict = taxes_dict.get(tax.tax_domain)
+        tax_dict_icms = taxes_dict.get("icms", {})
+        tax_dict_pis = taxes_dict.get("pis", {})
+        tax_dict_cofins = taxes_dict.get("cofins", {})
+        tax_dict["remove_from_base"] += (
+            tax_dict_icms.get("tax_value", 0.00)
+            + tax_dict_pis.get("tax_value", 0.00)
+            + tax_dict_cofins.get("tax_value", 0.00)
+        )
         return self._compute_tax(tax, taxes_dict, **kwargs)
 
     @api.model

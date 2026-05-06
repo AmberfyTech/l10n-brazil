@@ -155,7 +155,9 @@
                 <field name="fiscal_operation_id" optional="hide" />
                 <field name="fiscal_operation_line_id" optional="show" />
                 <field name="cfop_id" optional="hide" />
+                <field name="tax_classification_id" optional="hide" />
                 <field name="city_taxation_code_id" optional="hide" />
+                <field name="national_taxation_code_id" optional="hide" />
                 <field name="service_type_id" optional="hide" />
                 <field name="cnae_id" optional="hide" />
                 <field name="ncm_id" optional="hide" />
@@ -222,6 +224,7 @@
                 <field name="fiscal_operation_line_id" optional="hide" />
                 <field name="cfop_id" optional="hide" />
                 <field name="city_taxation_code_id" optional="hide" />
+                <field name="national_taxation_code_id" optional="hide" />
                 <field name="service_type_id" optional="hide" />
                 <field name="cnae_id" optional="hide" />
                 <field name="ncm_id" optional="hide" />
@@ -424,11 +427,15 @@
                 />
                 <field
                     name="city_taxation_code_id"
-                    attrs="{'invisible': ['|', ('document_type_id', '=', False), ('tax_icms_or_issqn', '=', 'icms')], 'required': [('document_type_id', '!=', False), ('tax_icms_or_issqn', '=', 'issqn'),('fiscal_operation_type','=','out')]}"
+                    attrs="{'invisible': ['|', ('document_type_id', '=', False), ('tax_icms_or_issqn', '=', 'icms')]}"
+                />
+                <field
+                    name="national_taxation_code_id"
+                    attrs="{'invisible': ['|', ('document_type_id', '=', False), ('tax_icms_or_issqn', '=', 'icms')]}"
                 />
                 <field
                     name="service_type_id"
-                    attrs="{'invisible': ['|', ('document_type_id', '=', False), ('tax_icms_or_issqn', '=', 'icms')], 'required': [('document_type_id', '!=', False), ('tax_icms_or_issqn', '=', 'issqn'),('fiscal_operation_type','=','out')]}"
+                    attrs="{'invisible': ['|', ('document_type_id', '=', False), ('tax_icms_or_issqn', '=', 'icms')]}"
                 />
                 <field
                     name="cnae_id"
@@ -436,6 +443,10 @@
                 />
                 <field
                     name="nbs_id"
+                    attrs="{'invisible': ['|', ('document_type_id', '=', False), ('tax_icms_or_issqn', '=', 'icms')]}"
+                />
+                <field
+                    name="operation_indicator_id"
                     attrs="{'invisible': ['|', ('document_type_id', '=', False), ('tax_icms_or_issqn', '=', 'icms')]}"
                 />
               </xpath>

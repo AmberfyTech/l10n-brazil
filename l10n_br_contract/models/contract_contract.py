@@ -1,7 +1,10 @@
 # Copyright 2020 KMEE INFORMATICA LTDA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models
+from collections import OrderedDict
+
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 
 class ContractContract(models.Model):
@@ -108,55 +111,71 @@ class ContractContract(models.Model):
         :return: list of dictionaries (inv_ids)
         """
         super_inv_vals = super()._prepare_recurring_invoices_values(date_ref=date_ref)
+        # TODO adapt for multi-countries
 
         if not self.fiscal_operation_id:
-            for inv_val in super_inv_vals:
-                inv_val["document_type_id"] = False
+            if isinstance(super_inv_vals, list):
+                for inv_val in super_inv_vals:
+                    inv_val["document_type_id"] = False
+            else:
+                super_inv_vals["document_type_id"] = False
             return super_inv_vals
 
         if not isinstance(super_inv_vals, list):
             super_inv_vals = [super_inv_vals]
 
-        inv_vals = []
-        document_type_list = []
+        groups = OrderedDict()
 
         for invoice_val in super_inv_vals:
-            # Identify how many Document Types exist
-            for inv_line in invoice_val.get("invoice_line_ids"):
-                if isinstance(inv_line[2], list):
+            base_header = {
+                k: v for k, v in invoice_val.items() if k != "invoice_line_ids"
+            }
+
+            for inv_line in invoice_val.get("invoice_line_ids", []):
+                if not isinstance(inv_line, (list, tuple)) or len(inv_line) < 3:
+                    continue
+                line_vals = inv_line[2] or {}
+
+                contract_line_id = self.env["contract.line"].browse(
+                    line_vals.get("contract_line_id")
+                )
+                if contract_line_id and not contract_line_id.create_invoice_visibility:
                     continue
 
                 operation_line_id = self.env["l10n_br_fiscal.operation.line"].browse(
-                    inv_line[2].get("fiscal_operation_line_id")
+                    line_vals.get("fiscal_operation_line_id")
                 )
+                if not operation_line_id:
+                    raise UserError(_("The contract has no fiscal operation defined!"))
 
                 fiscal_document_type = operation_line_id.get_document_type(
                     self.company_id
                 )
+                doc_type_id = fiscal_document_type.id
 
-                if fiscal_document_type.id not in document_type_list:
-                    document_type_list.append(fiscal_document_type.id)
-                    inv_to_append = invoice_val.copy()
-                    inv_to_append["invoice_line_ids"] = [inv_line]
-                    inv_to_append["document_type_id"] = fiscal_document_type.id
-                    inv_to_append["document_serie_id"] = (
-                        self.env["l10n_br_fiscal.document.serie"]
-                        .search(
-                            [
-                                (
-                                    "document_type_id",
-                                    "=",
-                                    inv_to_append["document_type_id"],
-                                ),
-                                ("company_id", "=", self.company_id.id),
-                            ],
-                            limit=1,
-                        )
-                        .id
+                key = (invoice_val.get("partner_id"), doc_type_id)
+
+                if key not in groups:
+                    inv_to_append = base_header.copy()
+                    inv_to_append.update(
+                        {
+                            "invoice_line_ids": [],
+                            "document_type_id": doc_type_id,
+                            "document_serie_id": self.env[
+                                "l10n_br_fiscal.document.serie"
+                            ]
+                            .search(
+                                [
+                                    ("document_type_id", "=", doc_type_id),
+                                    ("company_id", "=", self.company_id.id),
+                                ],
+                                limit=1,
+                            )
+                            .id,
+                        }
                     )
-                    inv_vals.append(inv_to_append)
-                else:
-                    index = document_type_list.index(fiscal_document_type.id)
-                    inv_vals[index]["invoice_line_ids"].append(inv_line)
+                    groups[key] = inv_to_append
 
-        return inv_vals
+                groups[key]["invoice_line_ids"].append(inv_line)
+
+        return list(groups.values())

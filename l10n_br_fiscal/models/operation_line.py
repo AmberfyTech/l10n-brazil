@@ -37,6 +37,11 @@ class OperationLine(models.Model):
 
     document_type_id = fields.Many2one(comodel_name="l10n_br_fiscal.document.type")
 
+    tax_classification_id = fields.Many2one(
+        comodel_name="l10n_br_fiscal.tax.classification",
+        string="Tax Classification",
+    )
+
     cfop_internal_id = fields.Many2one(
         comodel_name="l10n_br_fiscal.cfop",
         string="CFOP Internal",
@@ -172,6 +177,13 @@ class OperationLine(models.Model):
             cfop = self.cfop_export_id
         return cfop
 
+    def _get_tax_classification(self, company):
+        if self.tax_classification_id:
+            return self.tax_classification_id
+        elif company.tax_classification_id:
+            return company.tax_classification_id
+        return self.env["l10n_br_fiscal.tax.classification"]
+
     def _build_mapping_result_ipi(self, mapping_result, tax_definition):
         if tax_definition and tax_definition.ipi_guideline_id:
             mapping_result["ipi_guideline"] = tax_definition.ipi_guideline_id
@@ -203,6 +215,7 @@ class OperationLine(models.Model):
         nbs=None,
         cest=None,
         city_taxation_code=None,
+        national_taxation_code=None,
         service_type=None,
         ind_final=None,
     ):
@@ -211,12 +224,16 @@ class OperationLine(models.Model):
             "cfop": False,
             "ipi_guideline": self.env.ref("l10n_br_fiscal.tax_guideline_999"),
             "icms_tax_benefit_id": False,
+            "tax_classification": False,
         }
 
         self.ensure_one()
 
         # Define CFOP
         mapping_result["cfop"] = self._get_cfop(company, partner)
+
+        # Define Tax Classification
+        mapping_result["tax_classification"] = self._get_tax_classification(company)
 
         # 1 Get Tax Defs from Company
         for tax_definition in company.tax_definition_ids.map_tax_definition(
@@ -228,9 +245,19 @@ class OperationLine(models.Model):
             nbs=nbs,
             cest=cest,
             city_taxation_code=city_taxation_code,
+            national_taxation_code=national_taxation_code,
             service_type=service_type,
         ):
             self._build_mapping_result(mapping_result, tax_definition)
+
+        if mapping_result["tax_classification"]:
+            mapping_result["taxes"][
+                mapping_result["tax_classification"].tax_cbs_id.tax_domain
+            ] = mapping_result["tax_classification"].tax_cbs_id
+
+            mapping_result["taxes"][
+                mapping_result["tax_classification"].tax_ibs_id.tax_domain
+            ] = mapping_result["tax_classification"].tax_ibs_id
 
         # 2 From NCM
         if not ncm and product:
@@ -273,6 +300,7 @@ class OperationLine(models.Model):
             nbs=nbs,
             cest=cest,
             city_taxation_code=city_taxation_code,
+            national_taxation_code=national_taxation_code,
             service_type=service_type,
         ):
             self._build_mapping_result(mapping_result, tax_definition)
@@ -289,6 +317,7 @@ class OperationLine(models.Model):
             nbs=nbs,
             cest=cest,
             city_taxation_code=city_taxation_code,
+            national_taxation_code=national_taxation_code,
             service_type=service_type,
         ):
             self._build_mapping_result(mapping_result, tax_definition)
@@ -305,6 +334,7 @@ class OperationLine(models.Model):
             nbs=nbs,
             cest=cest,
             city_taxation_code=city_taxation_code,
+            national_taxation_code=national_taxation_code,
             service_type=service_type,
         ):
             self._build_mapping_result(mapping_result, tax_definition)
